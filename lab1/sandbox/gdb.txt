@@ -1,0 +1,14 @@
+Dump of assembler code for function main:
+   0x0000000000001149 <+0>:	endbr64 
+   0x000000000000114d <+4>:	push   %rbp
+   0x000000000000114e <+5>:	mov    %rsp,%rbp
+   0x0000000000001151 <+8>:	lea    0xeac(%rip),%rdi        # 0x2004
+   0x0000000000001158 <+15>:	callq  0x1050 <puts@plt>
+   0x000000000000115d <+20>:	lea    0xea9(%rip),%rdi        # 0x200d
+   0x0000000000001164 <+27>:	callq  0x1050 <puts@plt>
+   0x0000000000001169 <+32>:	lea    0xea2(%rip),%rdi        # 0x2012
+   0x0000000000001170 <+39>:	callq  0x1050 <puts@plt>
+   0x0000000000001175 <+44>:	mov    $0x0,%eax
+   0x000000000000117a <+49>:	pop    %rbp
+   0x000000000000117b <+50>:	retq   
+End of assembler dump.
