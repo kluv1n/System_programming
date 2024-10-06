@@ -4,15 +4,15 @@ public _start
 public read
 public compare
 
-include '/workspaces/System_programming/Lab_4/func.asm'
+include '/workspaces/System_programming/lab4/func.asm'
 
 section '.bss' writable
 input dq ?
 output dq ?
-password db "pass123", 0
-success db "Вошли", 0
+password db "querty123", 0
+success db "Пароль верный, вход выполнен!", 0
 failure db "Неудача", 0
-retry db "Неверный пароль", 0
+retry db "Пароль неверный, попробуйте еще раз!", 0
 
 section '.text' executable
 _start:
