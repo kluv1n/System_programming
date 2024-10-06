@@ -44,4 +44,20 @@ print_symbol:
     mov eax, 1
     mov edi, 1
     mov rsi, buffer
-    
+    mov edx, 1
+    syscall
+    ret
+
+_start:
+    pop rcx
+    cmp rcx, 2
+    jl .exit
+
+    mov rsi, [rsp + 8]
+    movzx rax, byte [rsi]
+    call print_symbol
+
+.exit:
+    mov eax, 60
+    xor edi, edi
+    syscall
