@@ -9,6 +9,7 @@ section '.data'
 
 section '.bss' writable
   place db 1
+  newline db 0x0A
 
 section '.text' executable
   _start:
@@ -23,6 +24,8 @@ section '.text' executable
        cmp rcx, -1
        jne .iter
 
+    mov al, [newline]
+    call print_symb
     call exit
 
 print_symb:

@@ -6,7 +6,8 @@ public print_symb
 
 section '.bss' writable
   number dq 4731757613    
-  result dq 0            
+  result dq 0      
+  newline db 0x0A      
   ten dq 10                 
   place db 1         
 
@@ -24,11 +25,10 @@ section '.text' executable
 
     mov [result], rbx       
 
-    ; Выводим результат
     call print_symb        
 
     mov eax, 60             
-    xor edi, edi        
+    xor edi, edi    
     call exit                  
 
 print_symb:

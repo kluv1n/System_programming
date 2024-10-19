@@ -42,7 +42,7 @@ print_symb:
     .print_loop:
         pop rax                  
         add rax, '0'             
-        mov [place], al         
+        mov [place], al
         mov eax, 1              
         mov edi, 1              
         mov rsi, place         

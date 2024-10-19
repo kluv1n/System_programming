@@ -1,0 +1,8 @@
+total 20
+drwxrwxrwx+ 2 codespace codespace 4096 Oct 19 11:06 .
+drwxrwxrwx+ 3 codespace codespace 4096 Oct 19 10:57 ..
+-rw-rw-rw-  2 codespace codespace    1 Oct 19 11:00 Task_1
+-rw-rw-rw-  1 codespace codespace    2 Oct 19 11:00 Task_2
+-rw-rw-rw-  1 codespace codespace    0 Oct 19 11:06 Task_3
+-rw-rw-rw-  2 codespace codespace    1 Oct 19 11:00 hard_link_to_Task_1
+lrwxrwxrwx  1 codespace codespace    6 Oct 19 11:06 symbolic_link_to_Task_2 -> Task_2
