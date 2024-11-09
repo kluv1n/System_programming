@@ -1,138 +1,185 @@
 format ELF64
-
 public _start
+public exit
 
-section '.bss' writable
-    buffer db 1
+section '.data' writable
+    n dq 0
+    result dq 0  
+    buffer rb 20
+    minus db '-'
 
 section '.text' executable
-
-; Функция для преобразования строки в число
-string_to_number:
-    push rcx
-    push rbx
-
-    xor rax, rax   ; результат
-    xor rcx, rcx   ; индекс
-
-.loop:
-    xor rbx, rbx
-    mov bl, byte [rsi + rcx] ; получаем текущий символ
-    cmp bl, 48               ; проверяем, что символ >= '0'
-    jl .is_finished_check
-    cmp bl, 57               ; проверяем, что символ <= '9'
-    jg .is_finished_check
-
-    sub bl, 48               ; преобразуем символ в число
-    imul rax, rax, 10        ; умножаем результат на 10
-    add rax, rbx             ; добавляем текущую цифру
-    inc rcx
-    jmp .loop
-
-.is_finished_check:
-    pop rbx
-    pop rcx
-    ret
-
-; Функция для нахождения первой значащей цифры числа k
-first_digit:
-    test rax, rax            ; проверка, что rax != 0
-    jz .return_zero          ; если 0, возвращаем 0
-
-.next_digit:
-    cmp rax, 10
-    jl .found_first_digit
-    xor rdx, rdx
-    mov rbx, 10
-    div rbx                  ; делим rax на 10, пока не найдем первую цифру
-    jmp .next_digit
-
-.return_zero:
-    mov rax, 0               ; если k == 0, возвращаем 0
-    ret
-
-.found_first_digit:
-    ret
-
-; Функция для вывода числа
-print_symbol:
-    xor rbx, rbx
-    cmp rax, 9
-    jle .one_sym
-
-    mov rcx, 10
-.loop:
-    xor rdx, rdx
-    div rcx
-    push rdx
-    inc rbx
-    test rax, rax
-    jnz .loop
-
-.print_loop:
-    pop rax
-    add rax, '0'
-    mov [buffer], al
-
-    mov eax, 1
-    mov edi, 1
-    mov rsi, buffer
-    mov edx, 1
-    syscall
-
-    dec rbx
-    jnz .print_loop
-    ret
-
-.one_sym:
-    add rax, '0'
-    mov [buffer], al
-
-    mov eax, 1
-    mov edi, 1
-    mov rsi, buffer
-    mov edx, 1
-    syscall
-    ret
-
 _start:
-    ; Проверяем, что есть аргумент командной строки (число n)
     pop rcx
-    cmp rcx, 2
-    jne exit
-
-    ; Преобразуем аргумент командной строки в число n
-    mov rsi, [rsp + 8]
+    pop rsi
+    pop rsi
     call string_to_number
-    mov rcx, rax              ; n сохраняется в rcx
+    mov [n], rax
+    mov rcx, [n]
 
-    ; Инициализируем счетчик и сумму
-    xor rbx, rbx              ; rbx будет содержать сумму
-    xor rdx, rdx              ; счетчик k
+    .iter:
+        mov rax, rcx
+        call first_digit
+        mul rcx
+        ;add [result], rcx
+        add [result], rax
 
-calc_loop:
-    inc rdx                   ; k++
-    mov rax, rdx              ; rax = k
-    call first_digit          ; находим первую цифру k
-    mov rbx, rax              ; сохраняем первую цифру k в rbx
+    loop .iter
 
-    ; Если первая цифра равна 0, пропускаем шаг (проверка)
-    test rbx, rbx
-    jz .skip_multiply
+    mov rax, [result]
+    mov rbx, buffer
+    mov rcx, 20
+    call number_to_string
+    mov rax, buffer
+    call print
 
-    mov rax, rdx              ; rax = k
-    imul rax, rbx             ; умножаем k на первую цифру
-    add rbx, rax              ; добавляем результат к сумме
+    call exit
 
-.skip_multiply:
-    cmp rdx, rcx              ; проверяем, не достигли ли n
-    jl calc_loop              ; продолжаем цикл
+first_digit:
+    push rbx
+    push rcx
+    push rdx
+    cmp rax, 9
+    jle .pos8
+    .pos7:
+    xor rdx, rdx      
+    mov rcx, 10
+    div rcx         
+    cmp rax, 10      
+    jge .pos7
+    .pos8:
+    pop rdx
+    pop rcx
+    pop rbx
+    ret
 
-    ; Выводим результат
-    mov rax, rbx              ; rax = сумма
-    call print_symbol
+number_to_string:
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+
+    cmp rax, 0          
+    jge .pos             
+    ._neg:
+      neg rax           
+      push rax    
+      push rbx
+      push rdx
+      mov rax, 4
+      mov rcx, minus      
+      mov rbx, 1
+      mov rdx, 1
+      int 0x80
+      pop rdx
+      pop rbx
+      pop rax
+    
+    .pos:
+    mov rsi, rcx
+    dec rsi
+    xor rcx, rcx
+    .next_iter:
+        push rbx
+        mov rbx, 10
+        xor rdx, rdx
+        div rbx
+        pop rbx
+        add rdx, '0'
+        push rdx
+        inc rcx
+        cmp rax, 0
+        je .next_step
+        jmp .next_iter
+    .next_step:
+        mov rdx, rcx
+        xor rcx, rcx
+    .to_string:
+        cmp rcx, rsi
+        je .pop_iter
+        cmp rcx, rdx
+        je .null_char
+        pop rax
+        mov [rbx+rcx], rax
+        inc rcx
+        jmp .to_string
+    .pop_iter:
+        cmp rcx, rdx
+        je .close
+        pop rax
+        inc rcx
+        jmp .pop_iter
+    .null_char:
+        mov rsi, rdx
+    .close:
+        mov [rbx+rsi], byte 0
+        pop rsi
+        pop rdx
+        pop rcx
+        pop rbx
+        pop rax
+        ret
+
+string_to_number:
+    push rsi
+    push rbx
+    push rcx
+    push rdx 
+
+    xor al, al
+    xor rcx, rcx
+    cmp byte [rsi], '-'
+    jne .next_char
+    mov al, 1 
+    inc rcx
+
+    .next_char:
+        movzx rbx, byte [rsi + rcx]
+        cmp bl, 0      
+        je .finished       
+
+        cmp bl, '0'             
+        jl .finished  
+        cmp bl, '9'
+        jg .finished         
+
+        sub bl, '0'            
+        
+        mov rdx, 10
+        mul rdx                  
+        add rax, rbx             
+        
+        inc rcx
+        jmp .next_char
+        
+    test al, 1            
+    jz .finished           
+        neg rax  
+    .finished:
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rsi
+    ret
+
+print:
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    mov rcx, rax
+    mov rax, 4 ;
+    mov rbx, 1 ;
+    mov rdx, 20 ;
+    int 0x80
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    ret
 
 exit:
-    mov eax, 60               ; системный вызов выхода
-    xor edi, edi
-    syscall
+    mov rax, 1     
+    xor rbx, rbx   
+    int 0x80

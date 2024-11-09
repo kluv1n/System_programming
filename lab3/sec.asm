@@ -69,6 +69,14 @@ print_symbol:
     dec rbx
     jnz .print_loop
 
+   
+    mov byte [buffer], 10     
+    mov eax, 1
+    mov edi, 1
+    mov rsi, buffer
+    mov edx, 1
+    syscall
+
     ret
 
 .one_sym:
@@ -80,25 +88,34 @@ print_symbol:
     mov rsi, buffer
     mov edx, 1
     syscall
+
+   
+    mov byte [buffer], 10     
+    mov eax, 1
+    mov edi, 1
+    mov rsi, buffer
+    mov edx, 1
+    syscall
+
     ret
 
 _start:
-    pop rcx
-    cmp rcx, 4
-    jne .exit
+    pop rcx                    
+    cmp rcx, 4                
+    jne .exit                 
+    mov rsi, [rsp + 8]         
+    call string_to_number     
+    mov rbx, rax               
 
-    mov rsi, [rsp + 8]
-    call string_to_number
-    mov rbx, rax
+    mov rsi, [rsp + 16]        
+    call string_to_number      
+    mov rcx, rax             
 
-    mov rsi, [rsp + 16]
-    call string_to_number
-    mov rcx, rax
+    mov rsi, [rsp + 24]      
+    call string_to_number    
+    mov rdx, rax             
 
-    mov rsi, [rsp + 24]
-    call string_to_number
-    mov rdx, rax
-
+    ; Вычисление: result = (rdx * rcx + rbx - rcx) / rdx
     mov rax, rdx
     imul rax, rcx
     add rax, rbx
@@ -107,9 +124,9 @@ _start:
     xor rdx, rdx
     div rcx
 
-    call print_symbol
+    call print_symbol         
 
 .exit:
-    mov eax, 60
-    xor edi, edi
+    mov eax, 60           
+    xor edi, edi     
     syscall

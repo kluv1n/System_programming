@@ -7,33 +7,40 @@ section '.bss' writable
 
 section '.text' executable
 print_symbol:
-    xor rbx, rbx
+    xor rbx, rbx          
 
     cmp rax, 9
-    jle .one_symb
+    jle .one_symb        
 
     mov rcx, 10
 
 .loop:
     xor rdx, rdx
-    div rcx
-    push rdx
-    inc rbx
-    test rax, rax
-    jnz .loop
+    div rcx               
+    push rdx            
+    inc rbx           
+    test rax, rax   
+    jnz .loop          
 
 .print:
-    pop rax
-    add rax, '0'
+    pop rax             
+    add rax, '0'       
     mov [buffer], al
 
+    mov eax, 1  
+    mov edi, 1        
+    mov rsi, buffer         
+    mov edx, 1       
+    syscall
+    dec rbx          
+    jnz .print              
+
+    mov byte [buffer], 10    
     mov eax, 1
     mov edi, 1
     mov rsi, buffer
     mov edx, 1
     syscall
-    dec rbx
-    jnz .print
 
     ret
 
@@ -46,18 +53,26 @@ print_symbol:
     mov rsi, buffer
     mov edx, 1
     syscall
+
+    mov byte [buffer], 10   
+    mov eax, 1
+    mov edi, 1
+    mov rsi, buffer
+    mov edx, 1
+    syscall
+
     ret
 
 _start:
-    pop rcx
-    cmp rcx, 2
-    jl .exit
+    pop rcx         
+    cmp rcx, 2      
+    jl .exit           
 
-    mov rsi, [rsp + 8]
-    movzx rax, byte [rsi]
-    call print_symbol
+    mov rsi, [rsp + 8]  
+    movzx rax, byte [rsi]  
+    call print_symbol      
 
 .exit:
-    mov eax, 60
-    xor edi, edi
+    mov eax, 60       
+    xor edi, edi     
     syscall
