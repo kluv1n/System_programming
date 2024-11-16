@@ -85,7 +85,9 @@ print_symbl:
      pop rbx
      ret
 
-
+;Function converting the string to the number
+;input rsi - place of memory of begin string
+;output rax - the number from the string
 str_number:
     push rcx
     push rbx
