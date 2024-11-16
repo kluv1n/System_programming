@@ -2,14 +2,14 @@ format ELF64
 
 public _start
 
-include 'func.asm'
+include '/workspaces/System_programming/lab4/func.asm'
 
 section '.bss' writable
-  output dq 0
-  input_buffer rb 255
+    input_buffer resb 256  ; Буфер для строк
 
 section '.text' executable
-  _start:
+_start:
+    ; Ввод числа с клавиатуры
     mov rax, 0
     mov rdi, 0
     mov rsi, input_buffer
@@ -18,53 +18,53 @@ section '.text' executable
     call str_number
     xor r8, r8
 
-    mov rbx, rax
-    xor rdi, rdi
+    mov rbx, rax            ; Верхняя граница
+    xor rdi, rdi            ; Счетчик чисел
     cmp rax, 5
-    jl .finish
-    mov rsi, 5
+    jl .finish              ; Если число меньше 5, завершаем
+    mov rsi, 5              ; Начало диапазона
 
-  .main_loop:
-     xor rcx, rcx
-     xor rdx, rdx
-     cmp rsi, rbx
-     jg .finish
+.main_loop:
+    xor rcx, rcx
+    xor rdx, rdx
+    cmp rsi, rbx
+    jg .finish              ; Если больше границы, завершаем
 
-  .check_seven_div:
-     xor rax, rax
-     mov rax, rsi
-     xor rcx, rcx
-     xor rdx, rdx
-     mov rcx, 7
-     div rcx
-     cmp rdx, 0
-     jg .check_three_div
+.check_seven_div:
+    xor rax, rax
+    mov rax, rsi
+    xor rcx, rcx
+    xor rdx, rdx
+    mov rcx, 7              ; Проверка деления на 7
+    div rcx
+    cmp rdx, 0
+    jg .check_three_div     ; Если остаток не 0, проверяем на 3
 
-     add rsi, 5
-     cmp rsi, rbx
-     jg .finish
+    add rsi, 5
+    cmp rsi, rbx
+    jg .finish              ; Если больше границы, завершаем
 
-  .check_three_div:
-     xor rax, rax
-     mov rax, rsi
-     xor rcx, rcx
-     xor rdx, rdx
-     mov rcx, 3
-     div rcx
-     cmp rdx, 0
-     jg .increment_counter
+.check_three_div:
+    xor rax, rax
+    mov rax, rsi
+    xor rcx, rcx
+    xor rdx, rdx
+    mov rcx, 3              ; Проверка деления на 3
+    div rcx
+    cmp rdx, 0
+    jg .increment_counter   ; Если остаток не 0, увеличиваем счетчик
 
-     add rsi, 5
-     cmp rsi, rbx
-     jg .finish
+    add rsi, 5
+    cmp rsi, rbx
+    jg .finish              ; Если больше границы, завершаем
 
-  .increment_counter:
-     add rdi, 1
-     add rsi, 5
-     cmp rsi, rbx
-     jl .main_loop
+.increment_counter:
+    add rdi, 1              ; Увеличиваем счетчик
+    add rsi, 5
+    cmp rsi, rbx
+    jl .main_loop           ; Продолжаем цикл
 
 .finish:
-    mov rax, rdi
+    mov rax, rdi            ; Выводим результат
     call print_num
     call exit

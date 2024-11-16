@@ -4,12 +4,12 @@ public _start
 public read
 public compare
 
-include '/workspaces/System_programming/Lab_4/func.asm'
+include '/workspaces/System_programming/lab4/func.asm'
 
 section '.bss' writable
 input dq ?
 output dq ?
-password db "querte0", 0
+password db "querty0", 0
 success db "Вошли", 0
 failure db "Неудача", 0
 retry db "Неверный пароль", 0
