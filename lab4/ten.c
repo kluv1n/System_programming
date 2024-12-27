@@ -2,7 +2,7 @@
 #include <string.h>
 
 #define MAX_ATTEMPTS 5
-#define PASSWORD "secret123"
+#define PASSWORD "querty0"
 
 int main() {
     char input[50];
